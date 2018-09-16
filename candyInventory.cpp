@@ -16,45 +16,56 @@ using namespace std;
 class CandyBar
 {
 private:
-	// Private variables.
+	// vectors used in parallel to keep track of name, cal, and wght.
 	vector<string> _brandName;
 	vector<float> _candyCalories;
 	vector<float> _candyWeight;
+
+	//floats to hold total count of all candy.
 	float totalCal;				
-	float totalWght; 		
-public:		
-	// Public Methods.
+	float totalWght; 	
+
+public:
+	// Main Methods that add functionality the CandyBar class.
 	void addCandyBar();
-	void display();
 	void deleteCandy();
+	void display();
 	void saveData();
 	void loadData();
-	void getTotal();
-	void clearData();			
-	void swap(float *i, float *j);	
-	void swapString(string *i, string *j);
-	void sortCalories(vector<string> &vectorName, vector<float> &arrayWeight, vector<float> &array);
-	void sortWeight(vector<string> &vectorName, vector<float> &arrayWeight, vector<float> &array);
+	void clearData();
+	void sort(vector<string> &, vector<float> &, vector<float> &, string);
+
+	//Generic template used for swaping strings and ints
+	template <class data>
+	void swapData(data *, data *);	
+
+	//Methods calls that can be called and access private CandyBar data
 	void callSortCal();
 	void callSortWght();
+	void setTotal();
+
+
 };
 
 // Adds a new candy bar.  
 void CandyBar::addCandyBar()
 {
+	//gets and pushes back the candys brand name.
 	cout << "Add Candy: " << endl;
 	cout << "Enter the new Candy Bar's brand name: ";
 
-	cin.ignore();
+	cin.ignore(); 
 	string brand;
 	getline(cin, brand);
 
 	_brandName.push_back(brand);
 
+	//gets and pushes back the candys calories.
 	cout << "Enter the calories for " << brand << ": ";
 	float cal;
 	float limit = 9999999999999.99;
 	cin >> cal;
+
 	while (cal > limit)
 	{
 		cout <<"Too big enter another number for the calories: ";
@@ -62,9 +73,11 @@ void CandyBar::addCandyBar()
 	}
 	_candyCalories.push_back(cal);
 
+	//gets and pushes back the candys wieght.
 	cout << "Enter the weight for " << brand << ": ";
 	float wght;
 	cin >> wght;
+
 	while (wght > limit)
 	{
 		cout <<"Too big enter another number for the weight: ";
@@ -72,14 +85,13 @@ void CandyBar::addCandyBar()
 	}
 	_candyWeight.push_back(wght);
 
-
 }
 
 // Deletes a candy bar.
 void CandyBar::deleteCandy()
 {
-	display();
 
+	//checks to see if there are candy to delete.
 	if (_brandName.size() == 0)
 	{
 		cout << "There is nothing to delete.\n" << endl;
@@ -87,10 +99,15 @@ void CandyBar::deleteCandy()
 	}
 	else
 	{
-		cout << "Which candy do you whish to delete: ";
+		//displays so the user knows which candy can be deleted.
+		display();
+
+		//gets candy's name to delete.
+		cout << "Which candy do you whish to delete <enter candy's name>:";
 		string delCandy;
 		cin >> delCandy;
 
+		//traverses the name vector and deletes if found else not found
 		for (unsigned int i = 0; i < _brandName.size(); i++)
 		{
 			if (delCandy == _brandName[i])
@@ -105,6 +122,7 @@ void CandyBar::deleteCandy()
 			else
 			{
 				cout << "This candy is not in the inventory." << endl;
+				break;
 			}
 		}
 	}
@@ -122,7 +140,7 @@ void CandyBar::display()
 		cout << _brandName[i] << setw(20 - _brandName[i].length()) << _candyCalories[i] << setw(17) << _candyWeight[i] << endl;
 	}
 	// Displays totals for candy bar calories and weight.
-	getTotal();														
+	setTotal();														
 	cout << "\nTotal calories: " << totalCal << endl;
 	cout << "Total weight: " << setw(4) << totalWght << endl;
 	cout << "***************************************" << endl;
@@ -183,19 +201,6 @@ void CandyBar::loadData()
   	}
 }
 
-// Displays totals for candy bar calories and weight.
-void CandyBar::getTotal()
-{
-	totalCal = 0;				
-	totalWght = 0;
-	for (unsigned int i = 0; i < _candyWeight.size(); i++)
-	{
-		totalCal = totalCal + _candyCalories[i]; 
-		totalWght = totalWght + _candyWeight[i];
-
-	}
-}
-
 // Clears all data from the inventory.
 void CandyBar::clearData()
 {
@@ -219,66 +224,72 @@ void CandyBar::clearData()
 		 }
 }
 
-// swap function used by the bubble sort to swap values.
-void CandyBar::swap(float *i, float *j)
-{
-	float temp = *i;
-	*i = *j;
-	*j = temp;
-}
-void CandyBar::swapString(string *i, string *j)
-{
-	string temp = *i;
-	*i = *j;
-	*j = temp;
-}
 // bubble sort function that sorts the calories from least to greatest.
-void CandyBar::sortCalories(vector<string> &vectorName, vector<float> &arrayWeight, vector<float> &array)
+void CandyBar::sort(vector<string> &vectorName, vector<float> &vectorWeight, vector<float> &vectorCal, string type)
 {
 	cout << "Sorting: \n";
 	//comparisons will be done n times.
-    for (unsigned int i = 0; i < array.size(); i++)
+    for (unsigned int i = 0; i < vectorCal.size(); i++)
     {
         //compare elemet to the next element, and swap if condition is true.
-        for(unsigned int j = 0; j < array.size() - 1; j++)
+        for(unsigned int j = 0; j < vectorCal.size() - 1; j++)
         {   
-            if (array[j] > array[j+1])
-            {
-                swap(&array[j], &array[j+1]);
-            	swap(&arrayWeight[j], &arrayWeight[j+1]);
-            	swapString(&vectorName[j], &vectorName[j+1]);
-            }
+        	//sorts by calories
+        	if (type == "calories")
+        	{
+        		if (vectorCal[j] > vectorCal[j+1])
+        		{
+                	swapData(&vectorCal[j], &vectorCal[j+1]);
+            		swapData(&vectorWeight[j], &vectorWeight[j+1]);
+            		swapData(&vectorName[j], &vectorName[j+1]);
+            	}
+        	}
+        	//sorts by weight
+        	else if (type == "weight")
+        	{
+           		if (vectorWeight[j] > vectorWeight[j+1])
+            	{
+            	    swapData(&vectorCal[j], &vectorCal[j+1]);
+            		swapData(&vectorWeight[j], &vectorWeight[j+1]);
+            		swapData(&vectorName[j], &vectorName[j+1]);
+            	}
+        	}
         }
     }
 }
 
-void CandyBar::sortWeight(vector<string> &vectorName, vector<float> &arrayWeight, vector<float> &array)
+// generic template and swap function used by the bubble sort to swap generic data.
+template<class data>
+void CandyBar::swapData(data *i, data *j)
 {
-	cout << "Sorting: \n";
-	//comparisons will be done n times.
-    for (unsigned int i = 0; i < array.size(); i++)
-    {
-        //compare elemet to the next element, and swap if condition is true.
-        for(unsigned int j = 0; j < array.size() - 1; j++)
-        {   
-            if (arrayWeight[j] > arrayWeight[j+1])
-            {
-                swap(&array[j], &array[j+1]);
-            	swap(&arrayWeight[j], &arrayWeight[j+1]);
-            	swapString(&vectorName[j], &vectorName[j+1]);
-            }
-        }
-    }
+	data temp = *i;
+	*i = *j;
+	*j = temp;
+
 }
+
+// sets totals for candy bar calories and weight.
+void CandyBar::setTotal()
+{
+	totalCal = 0;				
+	totalWght = 0;
+	for (unsigned int i = 0; i < _candyWeight.size(); i++)
+	{
+		totalCal = totalCal + _candyCalories[i]; 
+		totalWght = totalWght + _candyWeight[i];
+
+	}
+}
+
 // function call to sort the callories to be called by the object.
 void CandyBar::callSortCal()
 {
-	sortCalories(_brandName, _candyWeight, _candyCalories);
+	sort(_brandName, _candyWeight, _candyCalories, "calories");
 }
 // function call to sort the weight to be called by the object.
 void CandyBar::callSortWght()
 {
-	sortWeight(_brandName, _candyWeight, _candyCalories);
+	sort(_brandName, _candyWeight, _candyCalories, "weight");
 }
 // Function prototypes.
 void greetings();
