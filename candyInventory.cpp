@@ -40,8 +40,7 @@ public:
 	void swapData(data *, data *);	
 
 	//Methods calls that can be called and access private CandyBar data
-	void callSortCal();
-	void callSortWght();
+	void callSort(string);
 	void setTotal();
 
 
@@ -282,30 +281,25 @@ void CandyBar::setTotal()
 }
 
 // function call to sort the callories to be called by the object.
-void CandyBar::callSortCal()
+void CandyBar::callSort(string type)
 {
-	sort(_brandName, _candyWeight, _candyCalories, "calories");
+	sort(_brandName, _candyWeight, _candyCalories, type);
 }
-// function call to sort the weight to be called by the object.
-void CandyBar::callSortWght()
-{
-	sort(_brandName, _candyWeight, _candyCalories, "weight");
-}
+
 // Function prototypes.
 void greetings();
-void menu(CandyBar* candyBar);
+void menu(CandyBar candyBar);
 void endOfFile();
 
 // Main Function. 
 int main()
 {
-	CandyBar* candyBar = new CandyBar;
+	CandyBar candyBar;
 
 	greetings();
 	menu(candyBar);
 	endOfFile();
 
-	delete candyBar;
 }
 
 // Displays greeting to the user.  
@@ -318,7 +312,7 @@ void greetings()
 }
 
 // Function that displays the menu. 
-void menu(CandyBar* candyBar)
+void menu(CandyBar candyBar)
 {
 	int option = 0;
 	while (option != 9)
@@ -341,28 +335,28 @@ void menu(CandyBar* candyBar)
 		switch(option)
 		{
 			case 1:
-				candyBar->addCandyBar();
+				candyBar.addCandyBar();
 				break;
 			case 2:
-				candyBar->deleteCandy();
+				candyBar.deleteCandy();
 				break;
 			case 3:
-				candyBar->display();
+				candyBar.display();
 				break;
 			case 4:
-				candyBar->callSortCal();
+				candyBar.callSort("calories");
 				break;
 			case 5:
-				candyBar->saveData();
+				candyBar.saveData();
 				break;
 			case 6:
-				candyBar->loadData();
+				candyBar.loadData();
 				break;
 			case 7:
-				candyBar->clearData();
+				candyBar.clearData();
 				break;
 			case 8:
-				candyBar->callSortWght();
+				candyBar.callSort("weight");
 				break;
 		}
 	}
